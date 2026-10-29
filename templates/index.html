@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>PhishGuard AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  #bg-video{position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-3}
+  .dark-layer{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.2);z-index:-2}
+  .transparent-card{background:rgba(0,0,0,0.15) !important;backdrop-filter:blur(6px) !important;border:1px solid rgba(255,255,255,0.1) !important}
+  .transparent-input{background:rgba(255,255,255,0.08) !important;border:1px solid rgba(255,255,255,0.15) !important}
+  .transparent-btn{background:rgba(0,200,255,0.15) !important;border:1px solid rgba(0,200,255,0.3) !important;backdrop-filter:blur(4px)}
+</style>
+</head>
+<body class="text-white min-h-screen">
+<video id="bg-video" autoplay muted loop playsinline>
+  <source src="/static/videos/bg.mp4" type="video/mp4">
+</video>
+<div class="dark-layer"></div>
+
+<header class="flex justify-between items-center p-4 border-b border-white/10">
+<div class="flex items-center gap-3"><div class="w-10 h-10 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center">🛡️</div><h1 class="font-bold">PhishGuard AI</h1></div>
+<div class="flex items-center gap-2"><span class="text-xs text-cyan-300">الطالب: Ahmed Abu Bakr Sabri</span><img src="/static/images/me.jpg" class="w-10 h-10 rounded-full border border-white/20"></div>
+</header>
+
+<main class="flex flex-col items-center justify-center p-8 mt-10">
+<div class="transparent-card rounded-2xl p-8 w-full max-w-2xl">
+<h2 class="text-3xl font-bold text-center mb-2">فحص رابط الموقع</h2>
+<p class="text-white/60 text-center mb-6 text-sm">الصق الرابط لتحليله بالذكاء الاصطناعي</p>
+<input id="urlInput" class="transparent-input w-full rounded-xl p-3 text-left outline-none text-white" dir="ltr" placeholder="https://example.com">
+<button onclick="checkUrl()" class="transparent-btn w-full mt-3 rounded-xl py-3 font-bold">✨ تحليل الرابط</button>
+<div id="result" class="hidden mt-4 p-4 rounded-xl text-center"></div>
+</div>
+</main>
+
+<script>
+async function checkUrl(){
+ let url=document.getElementById('urlInput').value.trim();
+ let r=document.getElementById('result');
+ if(!url){alert('اكتب رابط');return;}
+ r.classList.remove('hidden');
+ r.className='mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300';
+ r.innerHTML='جاري الفحص...';
+ try{
+  let res=await fetch('/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url})});
+  let data=await res.json();
+  let isSafe = data.prediction.includes('آمن');
+  if(isSafe){
+      r.className='mt-4 p-4 rounded-xl bg-blue-500/20 border border-blue-400 text-blue-200 shadow-[0_0_15px_rgba(59,130,246,0.5)]';
+      r.innerHTML = '<b style="color:#60a5fa;font-size:20px">🔵 ' + data.prediction + '</b><br><span style="color:#93c5fd">' + data.reason + '</span><br>الخطورة: ' + data.score + '%';
+  } else {
+      r.className='mt-4 p-4 rounded-xl bg-red-500/20 border border-red-400 text-red-200 shadow-[0_0_15px_rgba(239,68,68,0.6)]';
+      r.innerHTML = '<b style="color:#f87171;font-size:20px">🔴 ' + data.prediction + '</b><br><span style="color:#fca5a5">' + data.reason + '</span><br>الخطورة: ' + data.score + '%';
+  }
+ }catch(e){r.innerHTML='خطأ: '+e.message;}
+}
+</script>
+<!-- قسم التواصل - اضافة جديدة فقط -->
+<footer class="mt-10 p-6 flex flex-col items-center gap-4">
+  <h3 class="text-white/70 text-sm font-bold">تواصل مع المطور</h3>
+  <div class="flex flex-wrap justify-center gap-3">
+    
+    <!-- فيسبوك -->
+    <a href="https://www.facebook.com/profile.php?id=61573108770038" target="_blank" 
+       class="transparent-card flex items-center gap-2 px-4 py-2 rounded-full hover:bg-blue-500/20 transition">
+      <img src="/static/images/me.jpg" class="w-8 h-8 rounded-full border border-white/20">
+      <span class="text-sm text-blue-300">Facebook</span>
+    </a>
+
+    <!-- تيك توك -->
+    <a href="https://www.tiktok.com/@hamo_almbrmj" target="_blank"
+       class="transparent-card flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/20 transition">
+      <img src="/static/images/me.jpg" class="w-8 h-8 rounded-full border border-white/20">
+      <span class="text-sm text-white">TikTok</span>
+    </a>
+
+    <!-- واتساب -->
+    <a href="https://wa.me/201096700804" target="_blank"
+       class="transparent-card flex items-center gap-2 px-4 py-2 rounded-full hover:bg-green-500/20 transition">
+      <img src="/static/images/me.jpg" class="w-8 h-8 rounded-full border border-white/20">
+      <span class="text-sm text-green-300">WhatsApp</span>
+    </a>
+
+  </div>
+  <p class="text-white/40 text-xs">01096700804</p>
+</footer>
+</body>
+</html>
